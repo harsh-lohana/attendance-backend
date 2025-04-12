@@ -4,6 +4,7 @@ const cors = require("cors");
 const connectDB = require("./config/database");
 const studentRouter = require("./routes/studentRoutes");
 const teacherRouter = require("./routes/teacherRoutes");
+const classroomRouter = require("./routes/classroomRoutes");
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(cors());
 
 app.use("/api/student", studentRouter);
 app.use("/api/teacher", teacherRouter);
+app.use("/api/classroom", classroomRouter);
 
 const PORT = process.env.PORT || 8000;
 
