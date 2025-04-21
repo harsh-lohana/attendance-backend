@@ -5,7 +5,6 @@ const asyncHandler = require("express-async-handler");
 
 const createClassroom = asyncHandler(async (req, res) => {
     const { teacherID, subject } = req.body;
-    console.log(teacherID, subject)
     const teacher = await Teacher.findById(teacherID);
 
     if (!teacher) {
@@ -74,4 +73,24 @@ const getStudentClassrooms = asyncHandler(async (req, res) => {
 
 })
 
-module.exports = { createClassroom, joinClassroom, getStudentClassrooms };
+const getTeacherClassrooms = asyncHandler(async (req, res) => {
+    const { teacherID } = req.query;
+    console.log(teacherID)
+
+    const teacher = await Teacher.findById(teacherID);
+    if (!teacher) {
+        res.status(400);
+        throw new Error("Teacher not found!");
+    }
+
+    const classrooms = await Classroom.find({ teacher: teacherID });
+    if (classrooms) {
+        res.status(201).json(classrooms);
+    } else {
+        res.status(400);
+        throw new Error("Classrooms not found!");
+    }
+
+})
+
+module.exports = { createClassroom, joinClassroom, getStudentClassrooms, getTeacherClassrooms };

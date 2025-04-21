@@ -2,9 +2,9 @@ const Student = require("../models/studentModel");
 const asyncHandler = require("express-async-handler");
 const generateToken = require("../utils/generateToken");
 const dotenv = require("dotenv");
-const crypto = require("crypto");
 const { S3Client, PutObjectCommand, GetObjectCommand } = require("@aws-sdk/client-s3");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+const generateID = require("../utils/generateID");
 
 dotenv.config();
 
@@ -21,13 +21,11 @@ const s3Client = new S3Client({
   }
 });
 
-const generateImageID = (bytes = 32) => crypto.randomBytes(bytes).toString('hex');
 
 const signupStudent = asyncHandler(async (req, res) => {
-
   const { name, email, password, studentID, branch, year } = req.body;
   const image = req.file;
-  const imageID = generateImageID();
+  const imageID = generateID();
 
   const putObjectParams = {
     Bucket: bucketName,
