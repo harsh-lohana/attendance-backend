@@ -40,8 +40,6 @@ const joinClassroom = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error("Classroom not found!");
     }
-    console.log(student)
-    console.log(classroom)
     if (!classroom.students.includes(student._id)) {
         classroom.students.push(student._id);
         await classroom.save();
@@ -63,7 +61,7 @@ const getStudentClassrooms = asyncHandler(async (req, res) => {
         throw new Error("Student not found!");
     }
 
-    const classrooms = await Classroom.find({ students: studentID });
+    const classrooms = await Classroom.find({ students: studentID }).populate("teacher");
     if (classrooms) {
         res.status(201).json(classrooms);
     } else {
@@ -75,7 +73,6 @@ const getStudentClassrooms = asyncHandler(async (req, res) => {
 
 const getTeacherClassrooms = asyncHandler(async (req, res) => {
     const { teacherID } = req.query;
-    console.log(teacherID)
 
     const teacher = await Teacher.findById(teacherID);
     if (!teacher) {
@@ -83,7 +80,7 @@ const getTeacherClassrooms = asyncHandler(async (req, res) => {
         throw new Error("Teacher not found!");
     }
 
-    const classrooms = await Classroom.find({ teacher: teacherID });
+    const classrooms = await Classroom.find({ teacher: teacherID }).populate("teacher");
     if (classrooms) {
         res.status(201).json(classrooms);
     } else {
