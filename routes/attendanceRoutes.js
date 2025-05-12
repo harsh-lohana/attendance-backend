@@ -1,5 +1,5 @@
 const express = require("express");
-const { createAttendance } = require("../controllers/attendanceControllers");
+const { createAttendance, getClassroomAttendance } = require("../controllers/attendanceControllers");
 const multer = require("multer");
 
 const storage = multer.memoryStorage();
@@ -9,5 +9,6 @@ const router = express.Router();
 
 router.get("/", (req, res) => { res.send("Attendance") });
 router.post("/create", upload.single("video"), createAttendance);
+router.get("/classroom", getClassroomAttendance);
 
 module.exports = router;

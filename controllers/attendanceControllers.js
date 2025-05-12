@@ -61,4 +61,16 @@ const createAttendance = asyncHandler(async (req, res) => {
 
 });
 
-module.exports = { createAttendance }
+const getClassroomAttendance = asyncHandler(async (req, res) => {
+    const { classroomID } = req.query;
+
+    const attendance = await Attendance.find({ classroom: classroomID });
+    if (attendance) {
+        res.status(200).json(attendance);
+    } else {
+        res.status(400);
+        throw new Error("Attendance not found!");
+    }
+});
+
+module.exports = { createAttendance, getClassroomAttendance }

@@ -53,7 +53,7 @@ const joinClassroom = asyncHandler(async (req, res) => {
 });
 
 const getStudentClassrooms = asyncHandler(async (req, res) => {
-    const { studentID } = req.body;
+    const { studentID } = req.query;
 
     const student = await Student.findById(studentID);
     if (!student) {
@@ -63,7 +63,28 @@ const getStudentClassrooms = asyncHandler(async (req, res) => {
 
     const classrooms = await Classroom.find({ students: studentID }).populate("teacher");
     if (classrooms) {
-        res.status(201).json(classrooms);
+        res.status(200).json(classrooms);
+    } else {
+        res.status(400);
+        throw new Error("Classrooms not found!");
+    }
+
+})
+
+const getAvailableClassrooms = asyncHandler(async (req, res) => {
+    const { studentID } = req.query;
+
+    const student = await Student.findById(studentID);
+    if (!student) {
+        res.status(400);
+        throw new Error("Student not found!");
+    }
+
+    const prefix = "B" + (["CSE", "ETC", "EEE", "IT", "CE"].indexOf(student.branch) + 1) + (25 - student.year) + ": ";
+
+    const classrooms = await Classroom.find({ subject: { $regex: `^${prefix}`, $options: 'i' }}).populate("teacher");
+    if (classrooms) {
+        res.status(200).json(classrooms);
     } else {
         res.status(400);
         throw new Error("Classrooms not found!");
@@ -82,7 +103,7 @@ const getTeacherClassrooms = asyncHandler(async (req, res) => {
 
     const classrooms = await Classroom.find({ teacher: teacherID }).populate("teacher");
     if (classrooms) {
-        res.status(201).json(classrooms);
+        res.status(200).json(classrooms);
     } else {
         res.status(400);
         throw new Error("Classrooms not found!");
@@ -90,4 +111,4 @@ const getTeacherClassrooms = asyncHandler(async (req, res) => {
 
 })
 
-module.exports = { createClassroom, joinClassroom, getStudentClassrooms, getTeacherClassrooms };
+module.exports = { createClassroom, joinClassroom, getStudentClassrooms, getTeacherClassrooms, getAvailableClassrooms };
