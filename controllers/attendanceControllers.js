@@ -1,12 +1,12 @@
 const Student = require("../models/studentModel");
 const Teacher = require("../models/teacherModel");
 const Classroom = require("../models/classroomModel");
+const Attendance = require("../models/attendanceModel");
 const asyncHandler = require("express-async-handler");
 const generateID = require("../utils/generateID");
 const dotenv = require("dotenv");
 const { S3Client, PutObjectCommand, GetObjectCommand } = require("@aws-sdk/client-s3");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
-const Attendance = require("../models/attendanceModel");
 
 dotenv.config();
 
@@ -64,7 +64,7 @@ const createAttendance = asyncHandler(async (req, res) => {
 const getClassroomAttendance = asyncHandler(async (req, res) => {
     const { classroomID } = req.query;
 
-    const attendance = await Attendance.find({ classroom: classroomID });
+    const attendance = await Attendance.find({ classroom: classroomID }).populate("students");
     if (attendance) {
         res.status(200).json(attendance);
     } else {
@@ -73,4 +73,31 @@ const getClassroomAttendance = asyncHandler(async (req, res) => {
     }
 });
 
-module.exports = { createAttendance, getClassroomAttendance }
+const getStudentClassroomAttendance = asyncHandler(async (req, res) => {
+    const { studentID, classroomID } = req.query;
+
+    const student = await Student.findById(studentID);
+    if (!student) {
+        res.status(400);
+        throw new Error("Student not found!");
+    }
+
+    const classroom = await Classroom.findById(classroomID);
+    if (!classroom) {
+        res.status(400);
+        throw new Error("Classroom not found!");
+    }
+
+    const total = await Attendance.find({ classroom: classroomID });
+    if (total) {
+        const present = total.filter(a => a.students.includes(studentID));
+        res.status(200).json({ total, present });
+    }
+    else {
+        res.status(400);
+        throw new Error("Attendance not found!");
+    }
+
+})
+
+module.exports = { createAttendance, getClassroomAttendance, getStudentClassroomAttendance }
