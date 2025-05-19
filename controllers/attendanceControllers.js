@@ -43,7 +43,7 @@ const createAttendance = asyncHandler(async (req, res) => {
         Key: videoID
     }
     const getCommand = new GetObjectCommand(getObjectParams);
-    const videoURL = await getSignedUrl(s3Client, getCommand, {expiresIn: 129600});
+    const videoURL = await getSignedUrl(s3Client, getCommand, {expiresIn: 604800});
 
     const attendance = await Attendance.create({ classroom: classroomID, video: videoURL });
 

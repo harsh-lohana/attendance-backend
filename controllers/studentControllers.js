@@ -48,7 +48,7 @@ const signupStudent = asyncHandler(async (req, res) => {
     Key: imageID
   }
   const getCommand = new GetObjectCommand(getObjectParams);
-  const imageURL = await getSignedUrl(s3Client, getCommand, {expiresIn: 129600});
+  const imageURL = await getSignedUrl(s3Client, getCommand, {expiresIn: 604800});
 
   const student = await Student.create({ name, email, password, studentID, branch, year, image: imageURL });
 
